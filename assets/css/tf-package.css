@@ -1,0 +1,424 @@
+.tf-single-package .tf-package-progressbar {
+    width: 100%;
+    overflow: hidden;
+    margin-bottom: 60px;
+}
+
+.tf-single-package .progressbar {
+    counter-reset: step;
+}
+
+.tf-single-package .progressbar li {
+    list-style-type: none;
+    width: 33.33%;
+    float: left;
+    position: relative;
+    text-align: center;
+    text-transform: uppercase;
+    color: #ddd;
+}
+
+.tf-single-package .progressbar li:before {
+    width: 40px;
+    height: 40px;
+    content: counter(step);
+    counter-increment: step;
+    line-height: 36px;
+    border: 2px solid #ddd;
+    display: block;
+    text-align: center;
+    margin: 0 auto 10px auto;
+    border-radius: 50%;
+    background-color: white;
+    position: relative;
+    z-index: 2;
+}
+
+.tf-single-package .progressbar li:after {
+    width: 100%;
+    height: 2px;
+    content: '';
+    position: absolute;
+    background-color: #ddd;
+    top: 20px;
+    left: -50%;
+    z-index: 1;
+}
+
+.tf-single-package .progressbar li:first-child:after {
+    content: none;
+}
+
+.tf-single-package .progressbar li.active {
+    color: #114764;
+}
+
+.tf-single-package .progressbar li.active:before {
+    border-color: #114764;
+}
+
+.tf-single-package .progressbar li.active+li:after {
+    background-color: #114764;
+}
+
+.tf-single-package .tf-package-content-item {
+    display: none;
+}
+
+.tf-single-package .tf-package-content-item.active {
+    display: block;
+}
+
+
+/* package list content */
+.tf-package-list-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 24px;
+}
+
+.tf-package-list-content .tf-package-list-item {
+    width: calc(33.33% - 16px);
+    -webkit-border-radius: 15px;
+    -moz-border-radius: 15px;
+    border-radius: 15px;
+    background: #fff;
+    box-shadow: 0px 5px 35px 0px rgba(157, 143, 132, 0.15);
+    padding: 30px;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+}
+
+.tf-package-list-content .tf-package-list-item .tf-item-featured {
+    position: absolute;
+    left: 30px;
+    top: 30px;
+}
+
+.tf-package-list-content .tf-package-list-item .tf-item-featured .tf-item-featured-text {
+    -webkit-border-radius: 100px;
+    -moz-border-radius: 100px;
+    border-radius: 100px;
+    padding: 8px 16px 7px 16px;
+    background: var(--tf-primary);
+    color: var(--tf-color-white);
+    font-size: 0.813rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.tf-package-list-content .tf-package-list-item .tf-item-thumbnail {
+    position: relative;
+    line-height: 0;
+
+}
+
+.tf-package-list-content .tf-package-list-item .tf-item-thumbnail img {
+    height: 280px;
+    width: 100%;
+    object-fit: cover;
+    -webkit-border-radius: 15px;
+    -moz-border-radius: 15px;
+    border-radius: 15px;
+}
+
+.tf-package-list-content .tf-package-list-item .tf-item-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1;
+}
+
+.tf-package-list-content .tf-package-list-item .tf-item-content .tf-item-top-info {
+    margin: 30px 0;
+}
+
+.tf-package-list-content .tf-package-list-item .tf-item-content .tf-item-top-info .tft-destination-rating {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    flex-wrap: wrap;
+    -webkit-box-align: center;
+    -moz-box-align: center;
+    -ms-flex-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+    gap: 5px;
+}
+
+.tf-package-list-content .tf-package-list-item .tf-item-content .tf-item-top-info .tft-destination-rating i {
+    color: var(tf-primary);
+    font-size: 0.875rem;
+}
+
+.tf-package-list-content .tf-package-list-item .tf-item-content .tf-item-top-info .tf-item-location {
+    display: block;
+    color: var(--tf-text-paragraph);
+    font-size: 1rem;
+    margin-top: 8px;
+    text-transform: capitalize;
+}
+
+.tf-package-list-content .tf-package-list-item .tf-item-content .tf-item-top-info .tf-item-location i {
+    color: var(--tf-primary);
+    float: left;
+    margin-right: 6px;
+    margin-top: 1px;
+}
+
+.tf-package-list-content .tf-package-list-item .tf-item-content .tf-item-top-info .tf-item-location span {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    color: var(--tf-text-paragraph);
+}
+
+.tf-package-list-content .tf-package-list-item .tf-item-content .tf-item-top-info .tf-item-title {
+    font-size: 1.5rem;
+    margin-bottom: 0px;
+    margin-top: 20px;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    color: var(--tf-text-heading);
+
+}
+
+.tf-package-list-content .tf-package-list-item .tf-item-content .tf-item-top-info .tf-item-title a {
+    -webkit-transition: all 0.2s ease;
+    -moz-transition: all 0.2s ease;
+    -o-transition: all 0.2s ease;
+    transition: all 0.2s ease;
+    color: inherit;
+    text-transform: capitalize;
+    color: inherit;
+    text-decoration: none;
+}
+
+.tf-package-list-content .tf-package-list-item .tf-item-content .tf-item-top-info .tf-item-title a:hover {
+    color: var(--tf-primary);
+}
+
+.tf-package-list-content .tf-package-list-item .tf-item-content .tf-item-bottom-info {
+    -webkit-border-radius: 15px;
+    -moz-border-radius: 15px;
+    border-radius: 15px;
+    border: 1px solid var(--tf-border-lite);
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    flex-wrap: wrap;
+    -webkit-box-align: center;
+    -moz-box-align: center;
+    -ms-flex-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-box-pack: justify;
+    -moz-box-pack: justify;
+    -ms-flex-pack: justify;
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 30px;
+}
+
+.tf-package-list-content .tf-package-list-item .tf-item-content .tf-item-bottom-info .tf-item-price .tf-item-price-title {
+    display: block;
+    font-size: 0.875rem;
+    margin-bottom: 10px;
+    text-transform: none;
+    color: var(--tf-text-paragraph);
+}
+
+.tf-package-list-content .tf-package-list-item .tf-item-content .tf-item-bottom-info .tf-item-price .tf-item-price-value {
+    color: var(--tf-primary);
+    font-size: 1.25rem;
+    text-transform: none;
+    font-weight: 700;
+}
+
+.tf-package-list-content .tf-package-list-item .tf-item-content .tf-item-bottom-info .tf-item-btn .tf-btn {
+    background: rgba(250, 100, 0, 0.1);
+    color: var(--tf-primary);
+    min-width: 136px;
+    min-height: 50px;
+    text-transform: capitalize;
+    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    border-radius: 100px;
+    text-decoration: none;
+}
+
+.tf-package-list-content .tf-package-list-item .tf-item-content .tf-item-bottom-info .tf-item-btn .tf-btn:hover {
+    background: var(--tf-brand-dark);
+    color: var(--tf-color-white);
+}
+
+.tf-package-list-content.tft-slider-disable {
+    overflow: initial;
+}
+
+.tf-package-list-content.tft-slider-disable .slick-track {
+    width: 100%;
+}
+
+.tf-package-list-content.tft-slider-disable .slick-list {
+    width: 100%;
+}
+
+
+/* package details popup */
+.tf-package-popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: none;
+    z-index: 9998;
+}
+
+.tf-package-popup {
+    position: fixed;
+    inset: 0;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.tf-package-popup-inner {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background: #fff;
+    overflow: hidden;
+}
+
+.tf-package-popup iframe {
+    width: 100%;
+    height: 100%;
+}
+
+.tf-package-popup-content,
+.tf-post-details {
+    height: 100%;
+}
+
+.tf-package-template-content {
+    height: 100%;
+    overflow: auto;
+}
+
+.tf-package-template-content {
+    overflow: auto;
+}
+
+.tf-package-popup-close {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    font-size: 16px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    z-index: 10;
+    padding: 0;
+    border: 1px solid #dc3545;
+    width: 35px;
+    height: 35px;
+    border-radius: 100px;
+    color: #dc3545;
+}
+
+body.admin-bar .tf-package-popup-close {
+    top: 40px;
+}
+
+.tf-package-popup-close:hover {
+    color: #fff;
+    background-color: #dc3545;
+}
+
+body.tf-popup-open {
+    overflow: hidden;
+}
+
+.tf-package-popup .skeleton-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    max-width: 1320px;
+    margin: 40px auto;
+    gap: 16px;
+}
+.tf-package-popup .skeleton {
+    background-color: #eee;
+    background-image: linear-gradient(90deg, #eee, #f5f5f5, #eee);
+    background-size: 200px 100%;
+    background-repeat: no-repeat;
+    border-radius: 4px;
+    display: inline-block;
+    line-height: 1;
+    width: 100%;
+    height: 60px;
+    margin: 0;
+    animation: skeleton-animation 2s ease-in-out infinite;
+}
+
+/* template single */
+
+@keyframes skeleton-animation {
+    0% {
+        background-position: -200px 0;
+    }
+
+    100% {
+        background-position: calc(200px + 100%) 0;
+    }
+}
+
+@media only screen and (max-width: 1024px) {
+    .tf-package-list-content .tf-package-list-item {
+        width: calc(50% - 16px);
+    }
+}
+
+@media only screen and (max-width: 767.98px) {
+    .tf-package-list-content .tf-package-list-item {
+        padding: 16px;
+    }
+
+    .tf-package-list-content .tf-package-list-item .tf-item-content .tf-item-top-info {
+        margin-bottom: 20px;
+    }
+
+    .tf-package-list-content .tf-package-list-item .tf-item-content .tf-item-bottom-info {
+        padding: 16px;
+    }
+
+}
+
+@media (max-width: 640px) {
+    .tf-package-list-content .tf-package-list-item .tf-item-thumbnail img {
+        height: 200px;
+    }
+
+    .tf-package-list-content .tf-package-list-item {
+        width: 100%;
+    }
+}
