@@ -23,7 +23,7 @@ $post_id = get_the_ID();
 /**
  * Review query
  */
-$args           = array(
+$args = array(
     'post_id' => $post_id,
     'status'  => 'approve',
     'type'    => 'comment',

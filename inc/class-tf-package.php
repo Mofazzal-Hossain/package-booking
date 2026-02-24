@@ -90,17 +90,20 @@ class TF_Package
     // enqueue scripts
     public function tf_package_scripts()
     {
-        $hotel_date_format_for_users   = ! empty(Helper::tfopt("tf-date-format-for-users")) ? Helper::tfopt("tf-date-format-for-users") : "Y/m/d";
-        $check_in_out = ! empty( $_GET['check-in-out-date'] ) ? sanitize_text_field( $_GET['check-in-out-date'] ) : '';
-        
-        wp_enqueue_style('tf-package-css', TF_PACKAGE_PLUGIN_URL . 'assets/css/tf-package.css', array(), time(), 'all');
-        wp_enqueue_script('tf-package-js', TF_PACKAGE_PLUGIN_URL . 'assets/js/tf-package.js', array('jquery'), time(), true);
-        wp_localize_script('tf-package-js', 'tf_package_data', array(
-            'ajaxurl' => admin_url('admin-ajax.php'),
-            'nonce'   => wp_create_nonce('tf_load_single_template'),
-            'user_date_format' => $hotel_date_format_for_users,
-            'checkInOut' => explode('-', $check_in_out),
-        ));
+        if (is_singular('tf_package') || is_archive('tf_package')) {
+
+            $hotel_date_format_for_users   = ! empty(Helper::tfopt("tf-date-format-for-users")) ? Helper::tfopt("tf-date-format-for-users") : "Y/m/d";
+            $check_in_out = ! empty($_GET['check-in-out-date']) ? sanitize_text_field($_GET['check-in-out-date']) : '';
+
+            wp_enqueue_style('tf-package-css', TF_PACKAGE_PLUGIN_URL . 'assets/css/tf-package.css', array(), time(), 'all');
+            wp_enqueue_script('tf-package-js', TF_PACKAGE_PLUGIN_URL . 'assets/js/tf-package.js', array('jquery'), time(), true);
+            wp_localize_script('tf-package-js', 'tf_package_data', array(
+                'ajaxurl' => admin_url('admin-ajax.php'),
+                'nonce'   => wp_create_nonce('tf_load_single_template'),
+                'user_date_format' => $hotel_date_format_for_users,
+                'checkInOut' => explode('-', $check_in_out),
+            ));
+        }
     }
 
     // load single template
@@ -126,6 +129,7 @@ class TF_Package
 
         setup_postdata($post);
 
+        ob_start();
         if ($post_type === 'tf_hotel') {
             include TF_PACKAGE_PLUGIN_PATH . '/inc/templates/single/hotel-single.php';
         }
@@ -133,8 +137,50 @@ class TF_Package
         if ($post_type === 'tf_tours') {
             include TF_PACKAGE_PLUGIN_PATH . '/inc/templates/single/tour-single.php';
         }
+        $html = ob_get_clean();
 
+        // tour availability
+        $single_tour_form_data = array();
+
+        $meta = get_post_meta($post_id, 'tf_tours_opt', true);
+        $tour_type                  = ! empty($meta['type']) ? $meta['type'] : '';
+        $tour_date_format_for_users = ! empty(Helper::tfopt("tf-date-format-for-users")) ? Helper::tfopt("tf-date-format-for-users") : "Y/m/d";
+
+        $tour_availability          = ! empty($meta['tour_availability']) ? json_decode($meta['tour_availability']) : '';
+
+        // Same Day Booking
+        $disable_same_day = ! empty($meta['disable_same_day']) ? $meta['disable_same_day'] : '';
+        $single_tour_form_data['first_day_of_week'] = !empty(Helper::tfopt("tf-week-day-flatpickr")) ? Helper::tfopt("tf-week-day-flatpickr") : 0;
+        $single_tour_form_data['date_format']      = esc_html($tour_date_format_for_users);
+        $single_tour_form_data['flatpickr_locale'] = ! empty(get_locale()) ? get_locale() : 'en_US';
+        if ($tour_type == 'fixed') {
+            $tour_availability          = ! empty($meta['tour_availability']) ? json_decode($meta['tour_availability'], true) : '';
+
+            $expanded = [];
+            if (!empty($tour_availability) && is_array($tour_availability)) {
+                foreach ($tour_availability as $range_key => $data) {
+                    if (empty($data['check_in']) || empty($data['check_out'])) {
+                        continue;
+                    }
+                    // copy original data and set check_in/check_out to the single date
+                    $entry = $data;
+                    $key = $data['check_in'] . ' - ' . $data['check_in'];
+                    $entry['check_in']  = $data['check_in'];
+                    $entry['check_out'] = $data['check_in'];
+                    $expanded[$key] = $entry;
+                }
+            }
+            $tour_availability =  $expanded;
+        }
+        $single_tour_form_data['disable_same_day'] = $disable_same_day;
+        $single_tour_form_data['tour_availability'] = $tour_availability;
+        $single_tour_form_data['is_all_unavailable'] = Helper::is_all_unavailable($tour_availability);
+        
         wp_reset_postdata();
+        wp_send_json_success([
+            'html' => $html,
+            'tour_form_data' => $single_tour_form_data
+        ]);
         wp_die();
     }
 

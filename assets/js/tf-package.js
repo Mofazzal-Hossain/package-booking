@@ -1,3 +1,16 @@
+(function () {
+    const originalParse = JSON.parse;
+    JSON.parse = function (text) {
+        let data = originalParse(text);
+        if (data && data.redirect_to) {
+            data._original_redirect_to = data.redirect_to;
+            delete data.redirect_to;
+        }
+        return data;
+    };
+
+})();
+
 jQuery(document).ready(function ($) {
 
     // progress step
@@ -25,11 +38,11 @@ jQuery(document).ready(function ($) {
     });
 
     // Previous button
-    $(document).on('click', '.tf-package-prev', function () {
-        if (currentStep > 0) {
-            showStep(currentStep - 1);
-        }
-    });
+    // $(document).on('click', '.tf-package-prev', function () {
+    //     if (currentStep > 0) {
+    //         showStep(currentStep - 1);
+    //     }
+    // });
 
     // open popup
     document.querySelectorAll(".tf-open-popup").forEach(button => {
@@ -38,7 +51,10 @@ jQuery(document).ready(function ($) {
             const postType = this.getAttribute("data-post-type");
             const popup    = document.getElementById("tf-package-popup");
             const loader   = document.querySelector(".skeleton-wrapper");
+            const $popupContent = jQuery(".tf-package-template-content");
             const body = document.body;
+
+            $popupContent.html('');
 
             if (!postId || !postType) return;
             popup.style.display = "block";
@@ -62,8 +78,12 @@ jQuery(document).ready(function ($) {
                 },
                 success: function (response) {
                     loader.style.display = "none";
-                    popup.querySelector(".tf-package-template-content").innerHTML = response;
-                    $()
+                    $popupContent.html(response.data.html);
+                    tf_package_data.tour_form_data = response.data.tour_form_data;
+                    setTimeout(function () {
+                        tf_package_slick_init();
+                        initTourFlatpickr();
+                    }, 50);
                 },
                 error: function (xhr, status, error) {
                     console.error("AJAX Error: " + error);
@@ -137,18 +157,357 @@ jQuery(document).ready(function ($) {
         this._flatpickr.open();
     });
 
+    jQuery(document).ajaxSuccess(function (event, xhr, settings) {
 
-    $(document).ajaxSuccess(function(event, xhr, settings) {
-        if (settings.url.includes('admin-ajax.php') && 
-            settings.data && 
-            settings.data.includes('tf_room_availability')) {
-            if( $("#rooms").length > 0){
-                $('.tf-package-template-content').animate({
-                    scrollTop: $("#rooms").offset().top
-                }, 500);
-               
-            }
+        if (!settings || !settings.url || !settings.url.includes('admin-ajax.php')) {
+            return;
         }
+
+        let action = null;
+
+        if (typeof settings.data === 'string') {
+            const params = new URLSearchParams(settings.data);
+            action = params.get('action');
+
+        }
+
+        else if (typeof settings.data === 'object' && !(settings.data instanceof FormData)) {
+            action = settings.data.action || null;
+        }
+
+        else if (settings.data instanceof FormData) {
+            action = settings.data.get('action');
+        }
+
+        if (!action) return; 
+
+        // HOTEL BOOKING
+        if (action === 'tf_hotel_booking') {
+            handleHotelBooking(xhr);
+        }
+
+        // TOUR BOOKING
+        if (action === 'tf_tours_booking') {
+            handleTourBooking(xhr);
+        }
+
+        // ROOM AVAILABILITY
+        if (action === 'tf_room_availability') {
+            handleRoomAvailability();
+        }
+
     });
 
+    const step = sessionStorage.getItem('tf_package_step');
+
+    if (step === 'second') {
+        if (jQuery('.tf-hotels-next').length) {
+            jQuery('.tf-hotels-next').click();
+        }
+    }
 });
+
+// hotel booking
+function handleHotelBooking(xhr) {
+    let response;
+    try {
+        response = JSON.parse(xhr.responseText);
+    } catch (e) {
+        return; // invalid JSON
+    }
+
+    if (response._original_redirect_to) {
+        
+        const $content = jQuery(".tf-package-template-content");
+     
+        if ($content.length) {
+            $content.html('<h3 class="tf-booking-success">Booking completed successfully! Moving to next step...</h3>');
+        }
+
+        sessionStorage.setItem('tf_package_step', 'second');
+
+        setTimeout(function () {
+            const $popupClose = jQuery('.tf-package-popup-close');
+            if ($popupClose.length) {
+                $popupClose.click();
+            }
+
+            const $nextStep = jQuery('.tf-hotels-next');
+            if ($nextStep.length) {
+                $nextStep.click();
+            }
+
+            const $secondStep = jQuery('.tf-first-step');
+            if ($secondStep.length) {
+                $secondStep.css({
+                    height: 'auto',
+                    opacity: 1,
+                    visibility: 'visible'
+                });
+            }
+        }, 3000); 
+        if( jQuery(".tf-single-package").length > 0){
+            jQuery('body,html').animate({
+                scrollTop: jQuery(".tf-single-package").offset().top
+            }, 500);
+        }
+    }
+}
+
+// tour booking
+function handleTourBooking(xhr) {
+    let response;
+    try {
+        response = JSON.parse(xhr.responseText);
+    } catch (e) {
+        return; 
+    }
+
+    if (response._original_redirect_to) {
+        
+        const $content = jQuery(".tf-package-template-content");
+        if ($content.length) {
+            $content.html('<h3 class="tf-booking-success">Booking completed successfully! Moving to next step...</h3>');
+        }
+
+        sessionStorage.removeItem('tf_package_step');
+
+        setTimeout(function () {
+            const $popupClose = jQuery('.tf-package-popup-close');
+            if ($popupClose.length) {
+                $popupClose.click();
+            }
+
+            const $nextStep = jQuery('.tf-tour-next');
+            if ($nextStep.length) {
+                $nextStep.click();
+            }
+
+        }, 3000); 
+        if( jQuery(".tf-single-package").length > 0){
+            jQuery('body,html').animate({
+                scrollTop: jQuery(".tf-single-package").offset().top
+            }, 500);
+        }
+    }
+}
+
+// room availability
+function handleRoomAvailability() {
+    if( jQuery("#rooms").length > 0){
+        jQuery('.tf-package-template-content').animate({
+            scrollTop: jQuery("#rooms").offset().top
+        }, 500);
+    }
+}
+
+// package popup slick init
+function tf_package_slick_init(){
+    jQuery('.tf-slider-items-wrapper').each(function () {
+        if (jQuery(this).hasClass('slick-initialized')) {
+            jQuery(this).slick('unslick');
+        }
+
+        jQuery(this).slick({
+            dots: true,
+            arrows: false,
+            infinite: true,
+            speed: 300,
+            autoplaySpeed: 2000,
+            slidesToShow: 3,
+            slidesToScroll: 1,
+            responsive: [
+                {
+                    breakpoint: 1024,
+                    settings: {
+                        slidesToShow: 3,
+                        slidesToScroll: 1,
+                        infinite: true,
+                        dots: true
+                    }
+                },
+                {
+                    breakpoint: 767,
+                    settings: {
+                        slidesToShow: 2,
+                        slidesToScroll: 1
+                    }
+                },
+                {
+                    breakpoint: 480,
+                    settings: {
+                        slidesToShow: 1,
+                        slidesToScroll: 1
+                    }
+                }
+            ]
+        });
+
+    });
+}
+
+// init tour flatpickr
+function initTourFlatpickr() {
+    function tf_package_flatpickr_locale() {
+        let locale = tf_package_data.tour_form_data.flatpickr_locale;
+        let allowed_locales = ['ar', 'bn_BD', 'de_DE', 'es_ES', 'fr_FR', 'hi_IN', 'it_IT', 'nl_NL', 'ru_RU', 'zh_CN' ];
+
+        if( jQuery.inArray(locale, allowed_locales) !== -1 ) {
+            
+            switch (locale) {
+                case "bn_BD":
+                    locale = 'bn';
+                    break;
+                case "de_DE":
+                    locale = 'de';
+                    break;
+                case "es_ES":
+                    locale = 'es';
+                    break;
+                case "fr_FR":
+                    locale = 'fr';
+                    break;
+                case "hi_IN":
+                    locale = 'hi';
+                    break;
+                case "it_IT":
+                    locale = 'it';
+                    break;
+                case "nl_NL":
+                    locale = 'nl';
+                    break;
+                case "ru_RU":
+                    locale = 'ru';
+                    break;
+                case "zh_CN":
+                    locale = 'zh';
+                    break;
+            }
+        } else {
+            locale = 'default';
+        }
+
+        return locale;
+    }
+
+    // let locale_zone = tf_package_flatpickr_locale();
+    window.flatpickr.l10ns[tf_package_flatpickr_locale()].firstDayOfWeek = tf_package_data.tour_form_data.first_day_of_week;
+
+    function populateTimeSelect(times) {
+        let timeSelect = jQuery('select[name="check-in-time"]');
+        let timeSelectDiv = jQuery(".check-in-time-div");
+        timeSelect.empty();
+
+        if (Object.keys(times).length > 0) {
+            timeSelect.append(`<option value="" selected hidden>${tf_params.tour_form_data.select_time_text}</option>`);
+            // Use the keys and values from the object to populate the options
+            $.each(times, function (key, value) {
+                timeSelect.append(`<option value="${key}">${value}</option>`);
+            });
+            timeSelectDiv.css('display', 'flex');
+        } else timeSelectDiv.hide();
+    }
+
+    var tour_date_options = {
+        enableTime: false,
+        dateFormat: "Y/m/d",
+        altInput: true,
+        altFormat: tf_package_data.tour_form_data.date_format,
+        locale: tf_package_flatpickr_locale(),
+        
+        onReady: function (selectedDates, dateStr, instance) {
+            instance.element.value = dateStr.replace(/[a-z]+/g, '-');
+            instance.altInput.value = instance.altInput.value.replace(/[a-z]+/g, '-');
+        },
+
+        onChange: function (selectedDates, dateStr, instance) {
+
+            instance.altInput.value = instance.altInput.value.replace(/[a-z]+/g, '-');
+            jQuery(".tours-check-in-out").val(instance.altInput.value);
+            jQuery('.tours-check-in-out[type="hidden"]').val(dateStr.replace(/[a-z]+/g, '-'));
+            
+            // Initialize empty object for times
+            let times = {};
+            const selectedDate = selectedDates[0];
+            const timestamp = selectedDate.getTime();
+
+            const tourAvailability = tf_package_data.tour_form_data.tour_availability;
+
+            for (const key in tourAvailability) {
+                const availability = tourAvailability[key];
+
+                if (availability.status !== 'available') continue;
+
+                const from = new Date(availability.check_in.trim()).getTime();
+                const to   = new Date(availability.check_out.trim()).getTime();
+
+                if (timestamp >= from && timestamp <= to) {
+                    const allowedTime = availability.allowed_time?.time || [];
+                    if (Array.isArray(allowedTime)) {
+                        allowedTime.forEach((t) => {
+                            if (t && t.trim() !== '') {
+                                times[t] = t;
+                            }
+                        });
+                    } else if (typeof allowedTime === 'object' && allowedTime !== null) {
+                        Object.values(allowedTime).forEach((t) => {
+                            if (t && t.trim() !== '') {
+                                times[t] = t;
+                            }
+                        });
+                    }
+
+                    break; // stop after first match
+                }
+            }
+
+            populateTimeSelect(times);
+        },
+
+    };
+
+    if (!tf_package_data.tour_form_data.is_all_unavailable && typeof tf_package_data.tour_form_data.tour_availability === 'object' && tf_package_data.tour_form_data.tour_availability && Object.keys(tf_package_data.tour_form_data.tour_availability).length > 0) {
+        tour_date_options.minDate = "today";
+        tour_date_options.disableMobile = "true";
+        tour_date_options.enable = Object.entries(tf_package_data.tour_form_data.tour_availability)
+        .filter(([dateRange, data]) => data.status === "available")
+        .map(([dateRange, data]) => {
+            const [fromRaw, toRaw] = dateRange.split(' - ').map(str => str.trim());
+
+            const today = new Date();
+            const formattedToday = today.getFullYear() + '/' + (today.getMonth() + 1) + '/' + today.getDate();
+            let fromDate = fromRaw;
+
+            return {
+                from: fromDate,
+                to: toRaw
+            };
+        });
+    }else{
+        tour_date_options.minDate = "today";
+    }
+
+    tour_date_options.disable = [];
+    if (tf_package_data.tour_form_data.is_all_unavailable && typeof tf_package_data.tour_form_data.tour_availability === 'object' && tf_package_data.tour_form_data.tour_availability && Object.keys(tf_package_data.tour_form_data.tour_availability).length > 0) {
+        tour_date_options.disable = Object.entries(tf_package_data.tour_form_data.tour_availability)
+        .filter(([dateRange, data]) => data.status === "unavailable")
+        .map(([dateRange, data]) => {
+            const [fromRaw, toRaw] = dateRange.split(' - ').map(str => str.trim());
+
+            const today = new Date();
+            const formattedToday = today.getFullYear() + '/' + (today.getMonth() + 1) + '/' + today.getDate();
+            let fromDate = fromRaw;
+
+            return {
+                from: fromDate,
+                to: toRaw
+            };
+        });
+    }
+
+    if (tf_package_data.tour_form_data.disable_same_day) {
+        tour_date_options.disable.push("today");
+    }
+    tour_date_options.disableMobile = "true";
+    jQuery(".tours-check-in-out").flatpickr(tour_date_options);
+}
