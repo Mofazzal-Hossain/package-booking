@@ -256,7 +256,6 @@ $tf_openstreet_map = ! empty(Helper::tfopt('google-page-option')) ? Helper::tfop
                                                         <input type="text" id="share_link_input"
                                                             class="share-center-url share-center-url-input"
                                                             value="<?php echo esc_attr($share_link); ?>" readonly>
-
                                                     </div>
                                                 </li>
                                             </ul>
@@ -335,7 +334,7 @@ $tf_openstreet_map = ! empty(Helper::tfopt('google-page-option')) ? Helper::tfop
                         <div class="tf-tour-details-right">
                             <?php if (($tf_booking_type == 2 && $tf_hide_booking_form !== '1' && $tf_ext_booking_type == 1) || ($tf_booking_type == 1) || $tf_booking_type == 3) : ?>
                                 <div class="tf-tour-booking-box tf-box">
-                                    <?php Hotel::tf_hotel_sidebar_booking_form(); ?>
+                                    <?php Hotel::tf_hotel_sidebar_booking_form('', '', 'design-1'); ?>
                                 </div>
                             <?php endif; ?>
                             <?php if (!empty($tf_ext_booking_code) && $tf_ext_booking_type == 2) : ?>

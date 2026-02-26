@@ -2,7 +2,7 @@
 // Don't load directly
 defined( 'ABSPATH' ) || exit;
 
-if ( ! $disable_review_sec == 1 ) { ?>
+if ( $disable_review_sec != 1 ) { ?>
 <div class="tf-review-wrapper tf-template-section" id="tf-review">
     <?php if ( get_comments_number() > 0 ) : ?>
         <!-- Tourfic review features ratting -->

@@ -260,7 +260,7 @@ if ( $rooms ) :
                                 </td>
                                 <td class="reserve tf-t-c">
 									<?php if ( ( $tf_booking_type == 2 && $tf_hide_price !== '1' ) || $tf_booking_type == 1 ) {
-										Pricing::instance( get_the_ID(), $_room->ID )->get_per_price_html( $room_option_key );
+										Pricing::instance( get_the_ID(), $_room->ID )->get_per_price_html( $room_option_key, 'design-1' );
 									} ?>
 									<?php if ( $tf_booking_type == 2 && ! empty( $tf_booking_url ) ): ?>
                                         <a href="<?php echo esc_url( $tf_booking_url ); ?>" class="tf_btn tf_btn_gray" target="_blank">
@@ -323,7 +323,7 @@ if ( $rooms ) :
                             <td class="reserve tf-t-c">
 								<?php
 								if ( ( $tf_booking_type == 2 && $tf_hide_price !== '1' ) || $tf_booking_type == 1 ) {
-                                    Pricing::instance(get_the_ID(), $room_id)->get_per_price_html();
+                                    Pricing::instance(get_the_ID(), $room_id)->get_per_price_html('', 'design-1');
 								}
 								?>
 								<?php if ( $tf_booking_type == 2 && ! empty( $tf_booking_url ) && $tf_ext_booking_type == 1 ): ?>

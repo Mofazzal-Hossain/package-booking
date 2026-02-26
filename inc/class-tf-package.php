@@ -30,6 +30,10 @@ class TF_Package
         // filters
         add_filter('tf_services_list', [$this, 'tf_package_services_list']);
         add_filter('tf_ask_question_post_types', [$this, 'tf_package_ask_question_post_types']);
+
+        // booking data
+        add_action('wp_ajax_tf_package_booking_data', [$this, 'tf_package_booking_data']);
+        add_action('wp_ajax_nopriv_tf_package_booking_data', [$this, 'tf_package_booking_data']);
     }
 
 
@@ -100,6 +104,7 @@ class TF_Package
             wp_localize_script('tf-package-js', 'tf_package_data', array(
                 'ajaxurl' => admin_url('admin-ajax.php'),
                 'nonce'   => wp_create_nonce('tf_load_single_template'),
+                'booking_nonce'   => wp_create_nonce('tf_package_booking_data'),
                 'user_date_format' => $hotel_date_format_for_users,
                 'checkInOut' => explode('-', $check_in_out),
             ));
@@ -109,6 +114,7 @@ class TF_Package
     // load single template
     public function tf_load_single_template()
     {
+        global $post, $wp_query, $withcomments;
         $post_id   = intval($_POST['post_id']);
         $post_type = sanitize_text_field($_POST['post_type']);
 
@@ -128,6 +134,10 @@ class TF_Package
         }
 
         setup_postdata($post);
+        $withcomments = true;
+        $wp_query->is_single = true;
+        $wp_query->queried_object = $post;
+        $wp_query->queried_object_id = $post->ID;
 
         ob_start();
         if ($post_type === 'tf_hotel') {
@@ -175,7 +185,7 @@ class TF_Package
         $single_tour_form_data['disable_same_day'] = $disable_same_day;
         $single_tour_form_data['tour_availability'] = $tour_availability;
         $single_tour_form_data['is_all_unavailable'] = Helper::is_all_unavailable($tour_availability);
-        
+
         wp_reset_postdata();
         wp_send_json_success([
             'html' => $html,
@@ -208,6 +218,206 @@ class TF_Package
             $post_types[] = 'tf_package';
         }
         return $post_types;
+    }
+
+    public function tf_package_booking_data(){
+        if (!wp_verify_nonce($_POST['nonce'], 'tf_package_booking_data')) {
+            wp_die();
+        }
+        $hotel_booking_id = ! empty($_POST['hotel_booking_id']) ? intval($_POST['hotel_booking_id']) : '';
+        $tour_booking_id = ! empty($_POST['tour_booking_id']) ? intval($_POST['tour_booking_id']) : '';
+        
+        if (!function_exists('WC') || !WC()->cart || WC()->cart->is_empty()) {
+            wp_send_json_error(['message' => 'Cart empty']);
+        }
+
+        $cart_items = array_reverse(WC()->cart->get_cart(), true);
+
+        $latest_hotel = null;
+        $latest_tour  = null; 
+
+        foreach ($cart_items as $cart_item_key => $cart_item) {
+
+            $product_id = $cart_item['product_id'];
+
+
+            // Save latest hotel match
+            if ($product_id == $hotel_booking_id && isset($cart_item['tf_hotel_data']) ) {
+                $latest_hotel = $cart_item; 
+            }
+
+            // Save latest tour match
+            if ($product_id == $tour_booking_id && isset($cart_item['tf_tours_data']) ) {
+                $latest_tour = $cart_item;
+            }
+            if ($latest_hotel && $latest_tour) {
+                break; 
+            }
+            
+        }
+
+        ob_start();
+        echo '<div class="tf-booking-details">';
+
+        if ($latest_hotel) {
+            $product = $latest_hotel['data'];
+            $hotel = $latest_hotel['tf_hotel_data'];
+
+            echo '<div class="tf-booking-item">';
+            echo '<div class="tf-booking-thumb">';
+            echo $product->get_image('thumbnail');
+            echo '</div>';
+            echo '<div class"tf-booking-info">';
+            echo '<h3 class="tf-booking-title">';
+            echo esc_html($product->get_name());
+            echo '</h3>';
+            if (! empty($hotel['price_total'])) {
+                echo '<strong>' . wc_price($hotel['price_total']) . '</strong>';
+            }
+            echo '<div class="tf-booking-meta">';
+
+            if (! empty($hotel['room_name'])) {
+                echo '<div><strong>' . esc_html__('Room', 'tourfic-package') . ':</strong> ' . esc_html($hotel['room_name']) . '</div>';
+            }
+            if (! empty($hotel['option'])) {
+                echo '<div><strong>' . esc_html__('Option', 'tourfic-package') . ':</strong> ' . esc_html($hotel['option']) . '</div>';
+            }
+            if (! empty($hotel['room'])) {
+                echo '<div><strong>' . esc_html__('Number of Room Booked', 'tourfic-package') . ':</strong> ' . esc_html($hotel['room']) . '</div>';
+            }
+            if (! empty($hotel['child'])) {
+                echo '<div><strong>' . esc_html__('Children', 'tourfic-package') . ':</strong> ' . esc_html($hotel['child']) . '</div>';
+            }
+            if (! empty($hotel['adult'])) {
+                echo '<div><strong>' . esc_html__('Adults', 'tourfic-package') . ':</strong> ' . esc_html($hotel['adult']) . '</div>';
+            }
+            if (! empty($hotel['children_ages'])) {
+                echo '<div><strong>' . esc_html__('Children Ages', 'tourfic-package') . ':</strong> ' . esc_html($hotel['children_ages']) . '</div>';
+            }
+            if (! empty($hotel['check_in'])) {
+                echo '<div><strong>' . esc_html__('Check-in', 'tourfic-package') . ':</strong> ' . esc_html($hotel['check_in']) . '</div>';
+            }
+            if (! empty($hotel['check_out'])) {
+                echo '<div><strong>' . esc_html__('Check-out', 'tourfic-package') . ':</strong> ' . esc_html($hotel['check_out']) . '</div>';
+            }
+
+            // Airport Service
+            if (! empty($hotel['air_serivice_avail']) && $hotel['air_serivice_avail'] == 1) {
+                if (! empty($hotel['air_serivicetype'])) {
+                    switch ($hotel['air_serivicetype']) {
+                        case 'pickup':
+                            echo '<div><strong>' . esc_html__('Airport Service', 'tourfic-package') . ':</strong> ' . esc_html__('Airport Pickup', 'tourfic-package') . '</div>';
+                            break;
+                        case 'dropoff':
+                            echo '<div><strong>' . esc_html__('Airport Service', 'tourfic-package') . ':</strong> ' . esc_html__('Airport Dropoff', 'tourfic-package') . '</div>';
+                            break;
+                        case 'both':
+                            echo '<div><strong>' . esc_html__('Airport Service', 'tourfic-package') . ':</strong> ' . esc_html__('Airport Pickup & Dropoff', 'tourfic-package') . '</div>';
+                            break;
+                    }
+                }
+                if (! empty($hotel['air_service_info'])) {
+                    echo '<div><strong>' . esc_html__('Airport Service Fee', 'tourfic-package') . ':</strong> ' . wp_strip_all_tags($hotel['air_service_info']) . '</div>';
+                }
+            }
+
+            // Hotel Extra
+            if (! empty($hotel['hotel_extra'])) {
+                echo '<div><strong>' . esc_html__('Hotel Extra Service', 'tourfic-package') . ':</strong> ' . esc_html($hotel['hotel_extra']) . '</div>';
+            }
+            if (! empty($hotel['hotel_extra_price'])) {
+                echo '<div><strong>' . esc_html__('Hotel Extra Service Fee', 'tourfic-package') . ':</strong> ' . wp_strip_all_tags(wc_price($hotel['hotel_extra_price'])) . '</div>';
+            }
+
+            // Due
+            if (isset($hotel['due'])) {
+                echo '<div><strong>' . esc_html__('Due', 'tourfic-package') . ':</strong> ' . wp_strip_all_tags(wc_price($hotel['due'])) . '</div>';
+            }
+            echo '</div>';
+            echo '</div>';
+            echo '</div>';
+        } 
+        if ($latest_tour) {
+            $product = $latest_tour['data'];
+            $tour = $latest_tour['tf_tours_data'];
+
+            // Assign variables
+            $tour_type        = ! empty($tour['tour_type']) ? $tour['tour_type'] : '';
+            $adults_number    = ! empty($tour['adults']) ? $tour['adults'] : '';
+            $childrens_number = ! empty($tour['childrens']) ? $tour['childrens'] : '';
+            $infants_number   = ! empty($tour['infants']) ? $tour['infants'] : '';
+            $start_date       = ! empty($tour['start_date']) ? $tour['start_date'] : '';
+            $end_date         = ! empty($tour['end_date']) ? $tour['end_date'] : '';
+            $tour_date        = ! empty($tour['tour_date']) ? $tour['tour_date'] : '';
+            $tour_time        = ! empty($tour['tour_time']) ? $tour['tour_time'] : '';
+            $tour_extra       = ! empty($tour['tour_extra_title']) ? $tour['tour_extra_title'] : '';
+            $package_title    = ! empty($tour['package_title']) ? $tour['package_title'] : '';
+            $due              = ! empty($tour['due']) ? $tour['due'] : null;
+
+            echo '<div class="tf-booking-item">';
+            echo '<div class="tf-booking-thumb">';
+            echo $product->get_image('thumbnail');
+            echo '</div>';
+            echo '<div class="tf-booking-info">';
+            echo '<h3 class="tf-booking-title">' . esc_html($product->get_name()) . '</h3>';
+
+            if (isset($tour['price']) && ! empty($tour['tour_extra_total'])) {
+                echo '<strong>' . wc_price($tour['price'] + $tour['tour_extra_total']) . '</strong>';
+            } elseif (isset($tour['price']) && empty($tour['tour_extra_total'])) {
+                echo '<strong>' . wc_price($tour['price']) . '</strong>';
+            }
+            echo '<div class="tf-booking-meta">';
+
+            // Adults
+            if ($adults_number && $adults_number >= 1) {
+                echo '<div><strong>' . esc_html__('Adults', 'tourfic-package') . ':</strong> ' . esc_html($adults_number) . '</div>';
+            }
+
+            // Children
+            if ($childrens_number && $childrens_number >= 1) {
+                echo '<div><strong>' . esc_html__('Children', 'tourfic-package') . ':</strong> ' . esc_html($childrens_number) . '</div>';
+            }
+
+            // Infants
+            if ($infants_number && $infants_number >= 1) {
+                echo '<div><strong>' . esc_html__('Infant', 'tourfic-package') . ':</strong> ' . esc_html($infants_number) . '</div>';
+            }
+
+            // Tour Date
+            if ($tour_type === 'fixed' && $start_date && $end_date) {
+                echo '<div><strong>' . esc_html__('Tour Date', 'tourfic-package') . ':</strong> ' . esc_html($start_date . ' - ' . $end_date) . '</div>';
+            } elseif ($tour_type === 'continuous' && $tour_date) {
+                echo '<div><strong>' . esc_html__('Tour Date', 'tourfic-package') . ':</strong> ' . esc_html(date_i18n("F j, Y", strtotime($tour_date))) . '</div>';
+                if ($tour_time) {
+                    echo '<div><strong>' . esc_html__('Tour Time', 'tourfic-package') . ':</strong> ' . esc_html($tour_time) . '</div>';
+                }
+            }
+
+            // Tour Extras
+            if ($tour_extra) {
+                echo '<div><strong>' . esc_html__('Tour Extra', 'tourfic-package') . ':</strong> ' . wp_kses_post($tour_extra) . '</div>';
+            }
+
+            // Package Title
+            if ($package_title) {
+                echo '<div><strong>' . esc_html__('Package', 'tourfic-package') . ':</strong> ' . esc_html($package_title) . '</div>';
+            }
+
+            // Due
+            if (! empty($due)) {
+                echo '<div><strong>' . esc_html__('Due', 'tourfic-package') . ':</strong> ' . wp_strip_all_tags(wc_price($due)) . '</div>';
+            }
+
+            echo '</div>';
+            echo '</div>';
+            echo '</div>';
+        }
+
+        echo '</div>';
+
+        $output = ob_get_clean();
+        wp_send_json_success(['booking_content' => $output]);
+        wp_die();
     }
 }
 

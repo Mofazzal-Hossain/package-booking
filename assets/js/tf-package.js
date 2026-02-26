@@ -52,6 +52,8 @@ jQuery(document).ready(function ($) {
             const popup    = document.getElementById("tf-package-popup");
             const loader   = document.querySelector(".skeleton-wrapper");
             const $popupContent = jQuery(".tf-package-template-content");
+            const $tfHotelBookingId = jQuery(".tf-hotel-booking-id");
+            const $tfTourBookingId = jQuery(".tf-tour-booking-id");
             const body = document.body;
 
             $popupContent.html('');
@@ -66,6 +68,13 @@ jQuery(document).ready(function ($) {
             // loader.style.display = "flex";
             document.body.style.overflow = "hidden";
             loader.style.display = "flex";
+
+            if(postType == 'tf_hotel'){
+                $tfHotelBookingId.val(postId);
+                sessionStorage.setItem('tf_hotel_book_id', postId);
+            }else if(postType == 'tf_tours'){
+                $tfTourBookingId.val(postId);  
+            }
 
             $.ajax({
                 url: tf_package_data.ajaxurl,
@@ -83,6 +92,10 @@ jQuery(document).ready(function ($) {
                     setTimeout(function () {
                         tf_package_slick_init();
                         initTourFlatpickr();
+                        tfTourStickBar();
+                        // initHotelFlatpickr();
+                      
+    
                     }, 50);
                 },
                 error: function (xhr, status, error) {
@@ -97,6 +110,11 @@ jQuery(document).ready(function ($) {
         const popup = document.getElementById("tf-package-popup");
         popup.style.display = "none";
         document.body.style.overflow = "";
+        if( jQuery(".tf-single-package").length > 0){
+            jQuery('body,html').animate({
+                scrollTop: jQuery(".tf-single-package").offset().top
+            }, 500);
+        }
     });
 
     // hotel room availability
@@ -111,51 +129,7 @@ jQuery(document).ready(function ($) {
         }, 500);
     });
 
-    // hotel date picker
-    window.flatpickr.l10ns.default.firstDayOfWeek = 0;
-    const regexMap = {
-        'Y/m/d': /(\d{4}\/\d{2}\/\d{2}).*(\d{4}\/\d{2}\/\d{2})/,
-        'd/m/Y': /(\d{2}\/\d{2}\/\d{4}).*(\d{2}\/\d{2}\/\d{4})/,
-        'm/d/Y': /(\d{2}\/\d{2}\/\d{4}).*(\d{2}\/\d{2}\/\d{4})/,
-        'Y-m-d': /(\d{4}-\d{2}-\d{2}).*(\d{4}-\d{2}-\d{2})/,
-        'd-m-Y': /(\d{2}-\d{2}-\d{4}).*(\d{2}-\d{2}-\d{4})/,
-        'm-d-Y': /(\d{2}-\d{2}-\d{4}).*(\d{2}-\d{2}-\d{4})/,
-        'Y.m.d': /(\d{4}\.\d{2}\.\d{2}).*(\d{4}\.\d{2}\.\d{2})/,
-        'd.m.Y': /(\d{2}\.\d{2}\.\d{4}).*(\d{2}\.\d{2}\.\d{4})/,
-        'm.d.Y': /(\d{2}\.\d{2}\.\d{4}).*(\d{2}\.\d{2}\.\d{4})/
-    };
-    const dateRegex = regexMap[tf_package_data.user_date_format];
-
-    $(document).on('focus click', ".tf-hotel-booking-sidebar #check-in-out-date", function() {
-        if (!this._flatpickr) {
-            this._flatpickr = flatpickr(this, {
-                enableTime: false,
-                mode: "range",
-                minDate: "today",
-                altInput: true,
-                altFormat: tf_package_data.user_date_format,
-                dateFormat: "Y/m/d",
-                defaultDate: tf_package_data.check_in_out,
-                onReady: function (selectedDates, dateStr, instance) {
-                    instance.element.value = dateStr.replace(/(\d{4}\/\d{2}\/\d{2}).*(\d{4}\/\d{2}\/\d{2})/g, function (match, date1, date2) {
-                        return `${date1} - ${date2}`;
-                    });
-                    instance.altInput.value = instance.altInput.value.replace( dateRegex, function (match, d1, d2) {
-                        return `${d1} - ${d2}`;
-                    });
-                },
-                onChange: function (selectedDates, dateStr, instance) {
-                    instance.element.value = dateStr.replace(/(\d{4}\/\d{2}\/\d{2}).*(\d{4}\/\d{2}\/\d{2})/g, function (match, date1, date2) {
-                        return `${date1} - ${date2}`;
-                    });
-                    instance.altInput.value = instance.altInput.value.replace( dateRegex, function (match, d1, d2) {
-                        return `${d1} - ${d2}`;
-                    });
-                },
-            });
-        }
-        this._flatpickr.open();
-    });
+   
 
     jQuery(document).ajaxSuccess(function (event, xhr, settings) {
 
@@ -205,6 +179,24 @@ jQuery(document).ready(function ($) {
             jQuery('.tf-hotels-next').click();
         }
     }
+
+    const target = document.body;
+    const observer = new MutationObserver(function () {
+        const isOpen = document.querySelector('.flatpickr-calendar.open');
+        if (isOpen) {
+            $(".tf-package-template-content").css("overflow", "hidden");
+        } else {
+            $(".tf-package-template-content").css("overflow", "auto");
+        }
+    });
+
+    observer.observe(target, {
+        attributes: true,
+        childList: true,
+        subtree: true
+    });
+
+
 });
 
 // hotel booking
@@ -266,37 +258,62 @@ function handleTourBooking(xhr) {
     if (response._original_redirect_to) {
         
         const $content = jQuery(".tf-package-template-content");
-        if ($content.length) {
-            $content.html('<h3 class="tf-booking-success">Booking completed successfully! Moving to next step...</h3>');
-        }
+        const $popupClose = jQuery('.tf-package-popup-close');
+        const $nextStep = jQuery('.tf-tour-next');
+        const $tfHotelBookingId = sessionStorage.getItem('tf_hotel_book_id');
+        const $tfTourBookingId = jQuery(".tf-tour-booking-id").val();
 
         sessionStorage.removeItem('tf_package_step');
 
-        setTimeout(function () {
-            const $popupClose = jQuery('.tf-package-popup-close');
-            if ($popupClose.length) {
-                $popupClose.click();
-            }
+        jQuery.ajax({
+            url: tf_package_data.ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'tf_package_booking_data',
+                hotel_booking_id: $tfHotelBookingId,
+                tour_booking_id: $tfTourBookingId,
+                nonce: tf_package_data.booking_nonce
+            },
+            beforeSend: function () {
+                if ($content.length) {
+                    $content.html('<h3 class="tf-booking-success">Booking completed successfully! Moving to next step...</h3>');
+                }
+            },
+            success: function (response) {
+                if(response.data.booking_content){
+                    jQuery(".tf-booking-content").html(response.data.booking_content);
+                }
 
-            const $nextStep = jQuery('.tf-tour-next');
-            if ($nextStep.length) {
-                $nextStep.click();
-            }
+                if ($popupClose.length) {
+                    $popupClose.click();
+                }
+                if ($nextStep.length) {
+                    $nextStep.click();
+                }
+                if( jQuery(".tf-single-package").length > 0){
+                    jQuery('body,html').animate({
+                        scrollTop: jQuery(".tf-single-package").offset().top
+                    }, 500);
+                }
+                // remove hotel booking id from session storage
+                sessionStorage.removeItem('tf_hotel_book_id');
 
-        }, 3000); 
-        if( jQuery(".tf-single-package").length > 0){
-            jQuery('body,html').animate({
-                scrollTop: jQuery(".tf-single-package").offset().top
-            }, 500);
-        }
+            },
+            error: function (xhr, status, error) {
+                console.error("AJAX Error: " + error);
+            }
+        });
     }
 }
 
 // room availability
 function handleRoomAvailability() {
-    if( jQuery("#rooms").length > 0){
-        jQuery('.tf-package-template-content').animate({
-            scrollTop: jQuery("#rooms").offset().top
+    var $container = jQuery('.tf-package-template-content');
+    var $target = jQuery('.tf-rooms-sections');
+
+    if ($target.length > 0) {
+        $container.animate({
+            scrollTop: $target.position().top + $container.scrollTop()
         }, 500);
     }
 }
@@ -345,6 +362,60 @@ function tf_package_slick_init(){
 
     });
 }
+
+// init hotel flatpickr
+// function initHotelFlatpickr(){
+//     window.flatpickr.l10ns.default.firstDayOfWeek = 0;
+//     const regexMap = {
+//         'Y/m/d': /(\d{4}\/\d{2}\/\d{2}).*(\d{4}\/\d{2}\/\d{2})/,
+//         'd/m/Y': /(\d{2}\/\d{2}\/\d{4}).*(\d{2}\/\d{2}\/\d{4})/,
+//         'm/d/Y': /(\d{2}\/\d{2}\/\d{4}).*(\d{2}\/\d{2}\/\d{4})/,
+//         'Y-m-d': /(\d{4}-\d{2}-\d{2}).*(\d{4}-\d{2}-\d{2})/,
+//         'd-m-Y': /(\d{2}-\d{2}-\d{4}).*(\d{2}-\d{2}-\d{4})/,
+//         'm-d-Y': /(\d{2}-\d{2}-\d{4}).*(\d{2}-\d{2}-\d{4})/,
+//         'Y.m.d': /(\d{4}\.\d{2}\.\d{2}).*(\d{4}\.\d{2}\.\d{2})/,
+//         'd.m.Y': /(\d{2}\.\d{2}\.\d{4}).*(\d{2}\.\d{2}\.\d{4})/,
+//         'm.d.Y': /(\d{2}\.\d{2}\.\d{4}).*(\d{2}\.\d{2}\.\d{4})/
+//     };
+//     const dateRegex = regexMap[tf_package_data.user_date_format];
+
+//     jQuery(document).on('focus click', ".tf-hotel-booking-sidebar #check-in-out-date", function() {
+//         this._flatpickr = flatpickr(this, {
+//             enableTime: false,
+//             mode: "range",
+//             minDate: "today",
+//             altInput: true,
+//             altFormat: tf_package_data.user_date_format,
+//             dateFormat: "Y/m/d",
+//             defaultDate: tf_package_data.check_in_out,
+//             onOpen: function() {
+//                 console.log('open');
+//                 jQuery(".tf-package-template-content").css("overflow", "hidden");
+//             },
+//             onClose: function() {
+//                 console.log('close');
+//                 jQuery(".tf-package-template-content").css("overflow", "auto");
+//             },
+//             onReady: function (selectedDates, dateStr, instance) {
+//                 instance.element.value = dateStr.replace(/(\d{4}\/\d{2}\/\d{2}).*(\d{4}\/\d{2}\/\d{2})/g, function (match, date1, date2) {
+//                     return `${date1} - ${date2}`;
+//                 });
+//                 instance.altInput.value = instance.altInput.value.replace( dateRegex, function (match, d1, d2) {
+//                     return `${d1} - ${d2}`;
+//                 });
+//             },
+//             onChange: function (selectedDates, dateStr, instance) {
+//                 instance.element.value = dateStr.replace(/(\d{4}\/\d{2}\/\d{2}).*(\d{4}\/\d{2}\/\d{2})/g, function (match, date1, date2) {
+//                     return `${date1} - ${date2}`;
+//                 });
+//                 instance.altInput.value = instance.altInput.value.replace( dateRegex, function (match, d1, d2) {
+//                     return `${d1} - ${d2}`;
+//                 });
+//             },
+//         });
+      
+//     });
+// }
 
 // init tour flatpickr
 function initTourFlatpickr() {
@@ -414,7 +485,6 @@ function initTourFlatpickr() {
         altInput: true,
         altFormat: tf_package_data.tour_form_data.date_format,
         locale: tf_package_flatpickr_locale(),
-        
         onReady: function (selectedDates, dateStr, instance) {
             instance.element.value = dateStr.replace(/[a-z]+/g, '-');
             instance.altInput.value = instance.altInput.value.replace(/[a-z]+/g, '-');
@@ -510,4 +580,33 @@ function initTourFlatpickr() {
     }
     tour_date_options.disableMobile = "true";
     jQuery(".tours-check-in-out").flatpickr(tour_date_options);
+}
+
+function tfTourStickBar() { 
+    // sticky bottom bar
+    if (jQuery('.tf-single-template__one .tf-booking-form').length > 0) {
+        jQuery('.tf-package-template-content').on("scroll", function () {
+            let bookingBox = jQuery('.tf-single-template__one .tf_tours_main_booking');
+            var sticky = jQuery('.tf-single-template__one .tf_tours_bottom_booking .tf-bottom-booking-bar'),
+                scroll = jQuery(window).scrollTop(),
+                footer = jQuery('footer');
+        
+            if (footer.length === 0 || bookingBox.length === 0 || sticky.length === 0) {
+                return; 
+            }
+            let boxOffset = bookingBox.offset().top + bookingBox.outerHeight();
+            var footerOffset = footer.offset().top,
+                windowHeight = jQuery(window).height();
+        
+            if (scroll >= boxOffset) {
+                if (scroll + windowHeight >= footerOffset) {
+                    sticky.removeClass('active'); 
+                } else {
+                    sticky.addClass('active');
+                }
+            } else {
+                sticky.removeClass('active');
+            }
+        });
+    }
 }
