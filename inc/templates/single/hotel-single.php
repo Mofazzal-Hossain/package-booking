@@ -129,7 +129,7 @@ $tf_openstreet_map = ! empty(Helper::tfopt('google-page-option')) ? Helper::tfop
 
 ?>
 <div class="tf-single-template__one">
-    <div class="tf-tour-single">
+    <div class="tf-hotel-single">
         <div class="tf-container">
             <div class="tf-container-inner">
                 <!-- Single Hotel Heading Section start -->

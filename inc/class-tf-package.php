@@ -72,14 +72,18 @@ class TF_Package
     // Add package template to tf-template-include filter
     public function tf_package_template($template)
     {
+        // package single
         if (is_singular('tf_package')) {
-
             $plugin_template = TF_PACKAGE_PLUGIN_PATH . 'inc/tf-single-package.php';
-
             if (file_exists($plugin_template)) {
                 return $plugin_template;
             }
         }
+
+        // package archive
+        if (is_post_type_archive('tf_package')) {
+            return TF_PACKAGE_PLUGIN_PATH . 'inc/tf-package-archive.php';
+        } 
 
         return $template;
     }

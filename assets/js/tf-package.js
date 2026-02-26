@@ -94,9 +94,14 @@ jQuery(document).ready(function ($) {
                         initTourFlatpickr();
                         tfTourStickBar();
                         // initHotelFlatpickr();
-                      
-    
-                    }, 50);
+
+                        // inc and decrement 
+                        if($('.tf-tour-single').length){
+                            $(document).off('click', '.acr-inc, .quanity-acr-inc');
+                            $(document).off('click', '.acr-dec, .quanity-acr-dec');
+                            tfIncDecInput();
+                        }
+                    }, 100);
                 },
                 error: function (xhr, status, error) {
                     console.error("AJAX Error: " + error);
@@ -130,6 +135,9 @@ jQuery(document).ready(function ($) {
     });
 
    
+
+
+    
 
     jQuery(document).ajaxSuccess(function (event, xhr, settings) {
 
@@ -609,4 +617,41 @@ function tfTourStickBar() {
             }
         });
     }
+}
+
+function tfIncDecInput(){
+    jQuery(document).on('click', '.acr-inc, .quanity-acr-inc', function () {
+
+        var $input = jQuery(this).parent().find('input');
+        var inputName = $input.attr('name');
+
+        var max  = $input.attr('data-max') ? parseInt($input.attr('data-max')) : 999;
+        var step = $input.attr('step') ? parseInt($input.attr('step')) : 1;
+
+        var currentVal = parseInt($input.val()) || 0;
+
+        if (currentVal < max) {
+            var newVal = currentVal + step;
+            jQuery('input[name="'+ inputName +'"]').each(function(){
+                jQuery(this).val(newVal).trigger('input').trigger('change');
+            });
+        }
+    });
+    jQuery(document).on('click', '.acr-dec, .quanity-acr-dec', function () {
+
+        var $input = jQuery(this).parent().find('input');
+        var inputName = $input.attr('name');
+
+        var min  = $input.attr('min') ? parseInt($input.attr('min')) : 0;
+        var step = $input.attr('step') ? parseInt($input.attr('step')) : 1;
+
+        var currentVal = parseInt($input.val()) || 0;
+
+        if (currentVal > min) {
+            var newVal = currentVal - step;
+            jQuery('input[name="'+ inputName +'"]').each(function(){
+                jQuery(this).val(newVal).trigger('input').trigger('change');
+            });
+        }
+    });
 }
