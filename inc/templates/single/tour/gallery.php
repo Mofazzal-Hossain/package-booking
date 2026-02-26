@@ -6,14 +6,14 @@ use \Tourfic\App\TF_Review;  ?>
 <!-- Tour Gallery Section -->
 <div class="tf-hero-gallery tf-mb-30 tf-template-section">
 <div class="tf-gallery-featured">
-    <img src="<?php echo !empty(wp_get_attachment_url( get_post_thumbnail_id(), 'tf_gallery_thumb' )) ? esc_url( wp_get_attachment_url( get_post_thumbnail_id(), 'tf_gallery_thumb' ) ) : esc_url(TF_ASSETS_APP_URL.'images/feature-default.jpg'); ?>" alt="<?php echo get_post_meta(get_post_thumbnail_id(), '_wp_attachment_image_alt', true); ?>">
+    <img src="<?php echo !empty(wp_get_attachment_url( get_post_thumbnail_id(), 'tf_gallery_thumb' )) ? esc_url( wp_get_attachment_url( get_post_thumbnail_id(), 'tf_gallery_thumb' ) ) : esc_url(TF_ASSETS_APP_URL.'images/feature-default.jpg'); ?>" alt="<?php echo esc_attr(get_post_meta(get_post_thumbnail_id(), '_wp_attachment_image_alt', true)); ?>">
     <div class="featured-meta-gallery-videos">
         <div class="featured-column tf-gallery-box">
             <?php 
             if ( ! empty( $gallery_ids ) ) {
             ?>
             <a id="featured-gallery" href="#" class="tf-tour-gallery">
-                <i class="fa-solid fa-camera-retro"></i><?php echo esc_html__("Gallery","tourfic"); ?>
+                <i class="fa-solid fa-camera-retro"></i><?php echo esc_html__("Gallery","tourfic-package"); ?>
             </a>
             <?php 
             }
@@ -25,7 +25,7 @@ use \Tourfic\App\TF_Review;  ?>
         if ( !empty($tour_video) ) { ?>
         <div class="featured-column tf-video-box">
             <a class="tf-tour-video" id="featured-video" data-fancybox="tour-video" href="<?php echo esc_url($tour_video); ?>">
-                <i class="fa-solid fa-video"></i> <?php echo esc_html__("Video","tourfic"); ?>
+                <i class="fa-solid fa-video"></i> <?php echo esc_html__("Video","tourfic-package"); ?>
             </a>
         </div>
         <?php } ?>
@@ -39,7 +39,7 @@ use \Tourfic\App\TF_Review;  ?>
         </a>
         <?php }else{ ?>
             <a href="#tf-review" class="tf-single-rating">
-                <span><?php esc_html_e( "0.0", "tourfic" ) ?></span> (<?php esc_html_e( "0 review", "tourfic" ) ?>)
+                <span><?php esc_html_e( "0.0", "tourfic-package" ) ?></span> (<?php esc_html_e( "0 review", "tourfic-package" ) ?>)
             </a>
         <?php } ?>
     <?php } ?>

@@ -12,7 +12,7 @@ if ( $tour_duration || $info_tour_type || $group_size || $language ) {
                         <i class="<?php echo esc_attr($tour_duration_icon); ?>"></i>
                     </div>
                     <div class="tf-feature-block-details">
-                        <h5><?php echo esc_html__( 'Duration', 'tourfic' ); ?></h5>
+                        <h5><?php echo esc_html__( 'Duration', 'tourfic-package' ); ?></h5>
                         <p><?php echo esc_html( $tour_duration ); ?>
                             <?php
                             if ( $tour_duration > 1 ) {
@@ -28,9 +28,9 @@ if ( $tour_duration || $info_tour_type || $group_size || $language ) {
                                     echo esc_html(', '. $night_count );
                                     if ( ! empty( $night_count ) ) {
                                         if ( $night_count > 1 ) {
-                                            echo esc_html__( ' Nights', 'tourfic' );
+                                            echo esc_html__( ' Nights', 'tourfic-package' );
                                         } else {
-                                            echo esc_html__( ' Night', 'tourfic' );
+                                            echo esc_html__( ' Night', 'tourfic-package' );
                                         }
                                     }
                                 echo '</span>';
@@ -62,7 +62,7 @@ if ( $tour_duration || $info_tour_type || $group_size || $language ) {
                     <i class="<?php echo esc_attr($tour_type_icon); ?>"></i>
                     </div>
                     <div class="tf-feature-block-details">
-                        <h5><?php echo esc_html__( 'Tour Type', 'tourfic' ); ?></h5>
+                        <h5><?php echo esc_html__( 'Tour Type', 'tourfic-package' ); ?></h5>
                         <p><?php echo esc_html( $info_tour_type ) ?></p>
                     </div>
                 </div>
@@ -73,7 +73,7 @@ if ( $tour_duration || $info_tour_type || $group_size || $language ) {
                     <i class="<?php echo esc_attr($tour_group_icon); ?>"></i>
                     </div>
                     <div class="tf-feature-block-details">
-                        <h5><?php echo esc_html__( 'Group Size', 'tourfic' ); ?></h5>
+                        <h5><?php echo esc_html__( 'Group Size', 'tourfic-package' ); ?></h5>
                         <p><?php echo esc_html( $group_size ) ?></p>
                     </div>
                 </div>
@@ -84,7 +84,7 @@ if ( $tour_duration || $info_tour_type || $group_size || $language ) {
                     <i class="<?php echo esc_attr($tour_lang_icon); ?>"></i>
                     </div>
                     <div class="tf-feature-block-details">
-                        <h5><?php echo esc_html__( 'Language', 'tourfic' ); ?></h5>
+                        <h5><?php echo esc_html__( 'Language', 'tourfic-package' ); ?></h5>
                         <p><?php echo esc_html( $language ) ?></p>
                     </div>
                 </div>

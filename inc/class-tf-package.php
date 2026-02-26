@@ -269,14 +269,14 @@ class TF_Package
 
             echo '<div class="tf-booking-item">';
             echo '<div class="tf-booking-thumb">';
-            echo $product->get_image('thumbnail');
+            echo wp_kses_post( $product->get_image( 'thumbnail' ) );
             echo '</div>';
             echo '<div class"tf-booking-info">';
             echo '<h3 class="tf-booking-title">';
             echo esc_html($product->get_name());
             echo '</h3>';
             if (! empty($hotel['price_total'])) {
-                echo '<strong>' . wc_price($hotel['price_total']) . '</strong>';
+                echo '<strong>' . wp_kses_post( wc_price( $hotel['price_total'] ) ) . '</strong>';
             }
             echo '<div class="tf-booking-meta">';
 
@@ -321,7 +321,7 @@ class TF_Package
                     }
                 }
                 if (! empty($hotel['air_service_info'])) {
-                    echo '<div><strong>' . esc_html__('Airport Service Fee', 'tourfic-package') . ':</strong> ' . wp_strip_all_tags($hotel['air_service_info']) . '</div>';
+                    echo '<div><strong>' . esc_html__('Airport Service Fee', 'tourfic-package') . ':</strong> ' . esc_html($hotel['air_service_info']) . '</div>';
                 }
             }
 
@@ -330,12 +330,12 @@ class TF_Package
                 echo '<div><strong>' . esc_html__('Hotel Extra Service', 'tourfic-package') . ':</strong> ' . esc_html($hotel['hotel_extra']) . '</div>';
             }
             if (! empty($hotel['hotel_extra_price'])) {
-                echo '<div><strong>' . esc_html__('Hotel Extra Service Fee', 'tourfic-package') . ':</strong> ' . wp_strip_all_tags(wc_price($hotel['hotel_extra_price'])) . '</div>';
+                echo '<div><strong>' . esc_html__('Hotel Extra Service Fee', 'tourfic-package') . ':</strong> ' . wp_kses_post(wc_price($hotel['hotel_extra_price'])) . '</div>';
             }
 
             // Due
             if (isset($hotel['due'])) {
-                echo '<div><strong>' . esc_html__('Due', 'tourfic-package') . ':</strong> ' . wp_strip_all_tags(wc_price($hotel['due'])) . '</div>';
+                echo '<div><strong>' . esc_html__('Due', 'tourfic-package') . ':</strong> ' . wp_kses_post(wc_price($hotel['due'])) . '</div>';
             }
             echo '</div>';
             echo '</div>';
@@ -360,15 +360,15 @@ class TF_Package
 
             echo '<div class="tf-booking-item">';
             echo '<div class="tf-booking-thumb">';
-            echo $product->get_image('thumbnail');
+            echo wp_kses_post( $product->get_image( 'thumbnail' ) );
             echo '</div>';
             echo '<div class="tf-booking-info">';
             echo '<h3 class="tf-booking-title">' . esc_html($product->get_name()) . '</h3>';
 
             if (isset($tour['price']) && ! empty($tour['tour_extra_total'])) {
-                echo '<strong>' . wc_price($tour['price'] + $tour['tour_extra_total']) . '</strong>';
+                echo '<strong>' . wp_kses_post( wc_price( $tour['price'] + $tour['tour_extra_total'] ) ) . '</strong>';
             } elseif (isset($tour['price']) && empty($tour['tour_extra_total'])) {
-                echo '<strong>' . wc_price($tour['price']) . '</strong>';
+                echo '<strong>' . wp_kses_post( wc_price( $tour['price'] ) ) . '</strong>';
             }
             echo '<div class="tf-booking-meta">';
 
@@ -409,7 +409,7 @@ class TF_Package
 
             // Due
             if (! empty($due)) {
-                echo '<div><strong>' . esc_html__('Due', 'tourfic-package') . ':</strong> ' . wp_strip_all_tags(wc_price($due)) . '</div>';
+                echo '<div><strong>' . esc_html__('Due', 'tourfic-package') . ':</strong> ' . wp_kses_post(wc_price($due)) . '</div>';
             }
 
             echo '</div>';

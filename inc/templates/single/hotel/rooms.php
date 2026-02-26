@@ -27,7 +27,7 @@ if ( $rooms ) :
 		$tf_hide_price        = ! empty( $meta['hide_price'] ) ? $meta['hide_price'] : '';
 		$tf_ext_booking_type  = ! empty( $meta['external-booking-type'] ) ? $meta['external-booking-type'] : '1';
 		$tf_ext_booking_code  = ! empty( $meta['booking-code'] ) ? $meta['booking-code'] : '';
-		$adults_name = apply_filters( 'tf_hotel_adults_title_change', esc_html__( 'Adult', 'tourfic' ) );
+		$adults_name = apply_filters( 'tf_hotel_adults_title_change', esc_html__( 'Adult', 'tourfic-package' ) );
 	}
 	if ( 2 == $tf_booking_type && ! empty( $tf_booking_url ) ) {
 		$external_search_info = array(
@@ -64,7 +64,7 @@ if ( $rooms ) :
             <table class="tf-availability-table" cellpadding="0" cellspacing="0">
                 <thead>
                 <tr>
-                    <th class="description" colspan="4"><?php esc_html_e( 'Room Details', 'tourfic' ); ?></th>
+                    <th class="description" colspan="4"><?php esc_html_e( 'Room Details', 'tourfic-package' ); ?></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -108,13 +108,13 @@ if ( $rooms ) :
 											?>
                                             <a href="#" class="tf-room-detail-qv" data-uniqid="<?php echo ! empty( $room['unique_id'] ) ? esc_attr( $room['unique_id'] . $room_id ) : '' ?>"
                                                data-hotel="<?php echo esc_attr( $post_id ); ?>">
-                                                <img src="<?php echo esc_url( $room_preview_img ); ?>" alt="<?php esc_html_e( "Room Image", "tourfic" ); ?>">
+                                                <img src="<?php echo esc_url( $room_preview_img ); ?>" alt="<?php esc_html_e( "Room Image", "tourfic-package" ); ?>">
                                                 <!-- <span><?php //esc_html_e("Best Offer", "tourfic");
 												?></span> -->
                                             </a>
 											<?php
 										} else { ?>
-                                            <img src="<?php echo esc_url( $room_preview_img ); ?>" alt="<?php esc_html_e( "Room Image", "tourfic" ); ?>">
+                                            <img src="<?php echo esc_url( $room_preview_img ); ?>" alt="<?php esc_html_e( "Room Image", "tourfic-package" ); ?>">
                                             <!-- <span><?php //esc_html_e("Best Offer", "tourfic");
 											?></span> -->
 										<?php } ?>
@@ -145,10 +145,10 @@ if ( $rooms ) :
                                     </div>
                                     <ul>
 										<?php if ( $footage ) { ?>
-                                            <li><i class="fas fa-ruler-combined"></i> <?php echo esc_html( $footage ); ?><?php esc_html_e( 'sft', 'tourfic' ); ?></li>
+                                            <li><i class="fas fa-ruler-combined"></i> <?php echo esc_html( $footage ); ?><?php esc_html_e( 'sft', 'tourfic-package' ); ?></li>
 										<?php } ?>
 										<?php if ( $bed ) { ?>
-                                            <li><i class="fas fa-bed"></i> <?php echo esc_html( $bed ); ?><?php esc_html_e( ' Number of Beds', 'tourfic' ); ?></li>
+                                            <li><i class="fas fa-bed"></i> <?php echo esc_html( $bed ); ?><?php esc_html_e( ' Number of Beds', 'tourfic-package' ); ?></li>
 										<?php } ?>
 										<?php
 										if ( ! empty( $room['features'] ) ) {
@@ -190,7 +190,7 @@ if ( $rooms ) :
 										?>
                                         <a href="#" class="tf-room-detail-qv tf-room-gallery-info" data-uniqid="<?php echo ! empty( $room['unique_id'] ) ? esc_attr( $room['unique_id'] . $room_id ) : '' ?>"
                                            data-hotel="<?php echo esc_attr( $post_id ); ?>">
-											<?php esc_html_e( "Room Photos & Details", "tourfic" ); ?>
+											<?php esc_html_e( "Room Photos & Details", "tourfic-package" ); ?>
                                         </a>
 
                                         <div id="tour_room_details_qv" class="tf-hotel-design-1-popup">
@@ -219,7 +219,7 @@ if ( $rooms ) :
                                     </ul>
                                 </td>
                                 <td class="pax">
-                                    <div><?php echo esc_html__( "Pax:", "tourfic" ); ?></div>
+                                    <div><?php echo esc_html__( "Pax:", "tourfic-package" ); ?></div>
 									<?php if ( $adult_number ) { ?>
                                         <div class="tf-tooltip tf-d-b">
                                             <div class="room-detail-icon">
@@ -232,7 +232,7 @@ if ( $rooms ) :
                                             <div class="tf-top">
 												<?php 
 												/* translators: %s: Label for adults (e.g. Adult, Person) */
-												printf( esc_html__( 'Number of %ss', 'tourfic' ), esc_html( $adults_name ) ); 
+												printf( esc_html__( 'Number of %ss', 'tourfic-package' ), esc_html( $adults_name ) ); 
 												?>
                                                 <i class="tool-i"></i>
                                             </div>
@@ -248,9 +248,9 @@ if ( $rooms ) :
 												<?php
 												if ( ! empty( $child_age_limit ) ) {
 													/* translators: Children age limit */
-													printf( esc_html__( 'Children Age Limit %s Years', 'tourfic' ), esc_html($child_age_limit) );
+													printf( esc_html__( 'Children Age Limit %s Years', 'tourfic-package' ), esc_html($child_age_limit) );
 												} else {
-													esc_html_e( 'Number of Children', 'tourfic' );
+													esc_html_e( 'Number of Children', 'tourfic-package' );
 												}
 												?>
                                                 <i class="tool-i"></i>
@@ -268,7 +268,7 @@ if ( $rooms ) :
                                         </a>
 									<?php else: ?>
                                         <button class="hotel-room-availability tf_btn tf_btn_gray" type="submit" style="margin: 0 auto;">
-											<?php esc_html_e( 'Check Availability', 'tourfic' ); ?>
+											<?php esc_html_e( 'Check Availability', 'tourfic-package' ); ?>
                                         </button>
 									<?php endif; ?>
                                 </td>
@@ -284,7 +284,7 @@ if ( $rooms ) :
                             <td class="options"></td>
 						<?php endif; ?>
                             <td class="pax">
-                                <div><?php echo esc_html__( "Pax:", "tourfic" ); ?></div>
+                                <div><?php echo esc_html__( "Pax:", "tourfic-package" ); ?></div>
 								<?php if ( $adult_number ) { ?>
                                     <div class="tf-tooltip tf-d-b">
                                         <div class="room-detail-icon">
@@ -294,7 +294,7 @@ if ( $rooms ) :
                                         <div class="tf-top">
 											<?php 
 											/* translators: %s: Label for adults (e.g. Adult, Person) */
-											printf( esc_html__( 'Number of %ss', 'tourfic' ), esc_html( $adults_name ) ); 
+											printf( esc_html__( 'Number of %ss', 'tourfic-package' ), esc_html( $adults_name ) ); 
 											?>
                                             <i class="tool-i"></i>
                                         </div>
@@ -310,9 +310,9 @@ if ( $rooms ) :
 											<?php
 											if ( ! empty( $child_age_limit ) ) {
 												/* translators: Children age limit */
-												printf( esc_html__( 'Children Age Limit %s Years', 'tourfic' ), esc_html($child_age_limit) );
+												printf( esc_html__( 'Children Age Limit %s Years', 'tourfic-package' ), esc_html($child_age_limit) );
 											} else {
-												esc_html_e( 'Number of Children', 'tourfic' );
+												esc_html_e( 'Number of Children', 'tourfic-package' );
 											}
 											?>
                                             <i class="tool-i"></i>
@@ -336,7 +336,7 @@ if ( $rooms ) :
                                     </a>
 								<?php else: ?>
                                     <button class="hotel-room-availability tf_btn tf_btn_gray" type="submit">
-										<?php esc_html_e( 'Check Availability', 'tourfic' ); ?>
+										<?php esc_html_e( 'Check Availability', 'tourfic-package' ); ?>
                                     </button>
 								<?php endif; ?>
                             </td>

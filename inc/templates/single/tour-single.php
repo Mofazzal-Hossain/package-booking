@@ -88,7 +88,7 @@ $share_link = get_permalink($post_id);
 $disable_share_opt  = ! empty($meta['t-share']) ? $meta['t-share'] : '';
 $t_share  = ! empty(Helper::tfopt('t-share')) ? Helper::tfopt('t-share') : 0;
 $disable_share_opt = ! empty($disable_share_opt) ? $disable_share_opt : $t_share;
-$tf_tour_single_book_now_text = isset($meta['single_tour_booking_form_button_text']) && ! empty($meta['single_tour_booking_form_button_text']) ? stripslashes(sanitize_text_field($meta['single_tour_booking_form_button_text'])) : esc_html__("Book Now", 'tourfic');
+$tf_tour_single_book_now_text = isset($meta['single_tour_booking_form_button_text']) && ! empty($meta['single_tour_booking_form_button_text']) ? stripslashes(sanitize_text_field($meta['single_tour_booking_form_button_text'])) : esc_html__("Book Now", 'tourfic-package');
 
 // Location
 if (!empty($meta['location']) && Helper::tf_data_types($meta['location'])) {
@@ -336,7 +336,7 @@ if (2 == $tf_booking_type && !empty($tf_booking_url)) {
                                     </a>
                                     <div id="dropdown-share-center" class="share-tour-content">
                                         <div class="tf-dropdown-share-content">
-                                            <h4><?php esc_html_e("Share with friends", "tourfic"); ?></h4>
+                                            <h4><?php esc_html_e("Share with friends", "tourfic-package"); ?></h4>
                                             <ul>
                                                 <li>
                                                     <a href="http://www.facebook.com/share.php?u=<?php echo esc_url($share_link); ?>"
@@ -372,13 +372,13 @@ if (2 == $tf_booking_type && !empty($tf_booking_url)) {
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <div title="<?php esc_attr_e('Share this link', 'tourfic'); ?>"
+                                                    <div title="<?php esc_attr_e('Share this link', 'tourfic-package'); ?>"
                                                         aria-controls="share_link_button">
                                                         <button id="share_link_button" class="tf_btn tf_btn_small share-center-copy-cta" tabindex="0"
                                                             role="button">
                                                             <i class="fa fa-link" aria-hidden="true"></i>
 
-                                                            <span class="tf-button-text share-center-copied-message"><?php esc_html_e('Link Copied!', 'tourfic'); ?></span>
+                                                            <span class="tf-button-text share-center-copied-message"><?php esc_html_e('Link Copied!', 'tourfic-package'); ?></span>
                                                         </button>
                                                         <input type="text" id="share_link_input"
                                                             class="share-center-url share-center-url-input"
@@ -508,7 +508,7 @@ if (2 == $tf_booking_type && !empty($tf_booking_url)) {
                                                         }
                                                     }
                                                     ?>
-                                                    <p> <span><?php esc_html_e("From", "tourfic"); ?></span>
+                                                    <p> <span><?php esc_html_e("From", "tourfic-package"); ?></span>
 
                                                         <?php
                                                         //get the lowest price from all available room price
@@ -623,7 +623,7 @@ if (2 == $tf_booking_type && !empty($tf_booking_url)) {
                                             <div class="tf-booking-form-data">
                                                 <div class="tf-booking-block">
                                                     <div class="tf-booking-price">
-                                                        <p><span><?php esc_html_e("From", "tourfic"); ?></span>
+                                                        <p><span><?php esc_html_e("From", "tourfic-package"); ?></span>
                                                             <?php
                                                             //get the lowest price from all available room price
                                                             $tour_price = isset($tour_price) && is_array($tour_price) ? $tour_price : [];
@@ -742,7 +742,7 @@ if (2 == $tf_booking_type && !empty($tf_booking_url)) {
                                                     <img src="<?php echo ! empty(get_the_post_thumbnail_url($selected_design_post_id, 'full')) ? esc_url(get_the_post_thumbnail_url($selected_design_post_id, 'full')) : esc_url(TF_ASSETS_APP_URL . 'images/feature-default.jpg'); ?>"
                                                         alt="">
                                                     <div class="tf-meta-data-price">
-                                                        <?php esc_html_e("From", "tourfic"); ?>
+                                                        <?php esc_html_e("From", "tourfic-package"); ?>
                                                         <span>
                                                             <?php if ($pricing_rule == 'group') {
                                                                 echo !empty($tour_price->wc_sale_group) ? wp_kses_post($tour_price->wc_sale_group) : wp_kses_post($tour_price->wc_group);

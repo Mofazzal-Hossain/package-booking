@@ -7,9 +7,9 @@ if($highlights){ ?>
     <div class="tf-highlights-inner tf-flex">
         <div class="tf-highlights-icon">
             <?php if ( ! empty( $meta['hightlights_thumbnail'] ) ): ?>
-                <img src="<?php echo esc_url( $meta['hightlights_thumbnail'] ); ?>" alt="<?php esc_html_e( 'Highlights Icon', 'tourfic' ); ?>" />
+                <img src="<?php echo esc_url( $meta['hightlights_thumbnail'] ); ?>" alt="<?php esc_html_e( 'Highlights Icon', 'tourfic-package' ); ?>" />
             <?php else: ?>
-                <img src="<?php echo esc_url(TF_ASSETS_APP_URL).'images/tour-highlights.png' ?>" alt="<?php esc_html_e( 'Highlights Icon', 'tourfic' ); ?>" />
+                <img src="<?php echo esc_url(TF_ASSETS_APP_URL).'images/tour-highlights.png' ?>" alt="<?php esc_html_e( 'Highlights Icon', 'tourfic-package' ); ?>" />
             <?php endif; ?>
         </div>
         <div class="ft-highlights-details">

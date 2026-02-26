@@ -92,6 +92,7 @@ if ($query->have_posts()) :
                             <?php
                             if (function_exists('wc_price')) {
                                 $currency_code   = get_woocommerce_currency();
+                                /* translators: %s: Currency code (e.g., USD, EUR). */
                                 echo sprintf(esc_html__('From %s', 'tourfic-package'), $currency_code);
                             } else {
                                 echo esc_html__('From USD', 'tourfic-package');

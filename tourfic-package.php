@@ -6,6 +6,7 @@
  * Author: Themefic
  * Author URI: https://themefic.com/
  * Text Domain: tourfic-package
+ * License: GPL-2.0+
  */
 
 defined( 'ABSPATH' ) || exit;

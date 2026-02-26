@@ -30,7 +30,7 @@ if ( function_exists('is_tf_pro') && is_tf_pro() ) {
                     <div class="tf-itinerary-content tf-mt-16 tf-flex-gap-16 tf-flex">
                         <?php if ( $itinerary['image'] ) { ?>
                             <div class="tf-itinerary-content-img">
-                                <img src="<?php echo esc_url( $itinerary['image'] ); ?>" alt="<?php esc_html_e("Itinerary Image","tourfic"); ?>" />
+                                <img src="<?php echo esc_url( $itinerary['image'] ); ?>" alt="<?php esc_html_e("Itinerary Image","tourfic-package"); ?>" />
                             </div>
                         <?php } ?>
                         <div class="<?php echo !empty($itinerary['image']) ? esc_attr('tf-itinerary-content-details') : ''; ?>">
